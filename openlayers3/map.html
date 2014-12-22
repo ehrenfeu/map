@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="ol3/ol.css" type="text/css">
+    <link rel="stylesheet" href="css/map.css" type="text/css">
+    <title>OpenSeaMap with OpenLayers 3</title>
+    <script src="ol3/ol-debug.js" type="text/javascript"></script>
+    <script src='http://code.jquery.com/jquery-1.11.1.js'></script>
+  </head>
+  <body>
+    <div id="map">
+        <div id="sidepanel">
+            <div id="sidebar"></div>
+            <div id="menubuttons">
+                <div id="showlayerselector"></div>
+                <div id="showsearch"></div>
+            </div>
+        </div>
+    </div>
+     
+    <script type="text/javascript">
+
+var map;
+function sidePanelShowOnly(panel_id) {
+    var children = document.getElementById('sidebar').children;
+    for(i=0; i<children.length; i++) {
+        if (children[i].id == panel_id)
+            children[i].removeAttribute("hidden");
+        else
+            children[i].setAttribute("hidden", "hidden");
+    }
+}
+    
+/**
+ * @constructor
+ * @extends {ol.control.Control}
+ * @param {Object=} opt_options Control options.
+ */
+function SearchResults(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('div');
+    element.id = 'search';
+    element.className = 'search';
+    element.setAttribute("hidden", "hidden"); 
+    var searchfield = document.createElement('INPUT');
+    searchfield.setAttribute("type", "text"); 
+    searchfield.className = 'inputfield';
+    var results = document.createElement('div');
+    results.id = 'searchresults';
+    element.appendChild(results);
+    element.appendChild(searchfield);
+    var sidebar = document.getElementById('sidebar');
+    while (sidebar.hasChildNodes())
+        sidebar.removeChild(sidebar.firstChild);
+    function showSearchResults(searchstring) {
+        while (results.hasChildNodes())
+            results.removeChild(results.firstChild);
+        $.getJSON('http://nominatim.openstreetmap.org/search?format=json&limit=15&q='
+        + searchstring, function(data) {
+            var results = document.getElementById('searchresults');
+            var foundresults = false;
+            $.each(data, function(key, val) {
+                var btn = document.createElement("a");
+                btn.className = 'searchresult';
+                var t = document.createTextNode(val.display_name);
+                btn.appendChild(t);    
+                btn.addEventListener('click', function(e) {
+                    console.log(val);
+                    console.log(val.lat);
+                    map.getView().setCenter(ol.proj.transform([parseFloat(val.lon),
+                    parseFloat(val.lat)], 'EPSG:4326',
+                    'EPSG:3857'));
+                });
+                results.appendChild(btn);
+                foundresults = true
+            });
+
+            if (foundresults == false) 
+                results.appendChild(document.createTextNode("No results found"));
+            });
+    }
+    searchfield.addEventListener('keypress', function(e) {
+        if (e.keyCode == 13) // on enter
+            showSearchResults(e.target.value)});
+
+    ol.control.Control.call(this, {
+        element: element,
+        target: options.target
+    });
+};
+ol.inherits(SearchResults, ol.control.Control);
+
+function addSearchPanel(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('div');
+    element.id = 'search';
+    element.className = 'search';
+    element.setAttribute("hidden", "hidden"); 
+    var sidebar = document.getElementById('sidebar');
+    sidebar.appendChild(element);
+    var searchfield = document.createElement('INPUT');
+    searchfield.setAttribute("type", "text"); 
+    searchfield.className = 'inputfield';
+    var results = document.createElement('div');
+    results.id = 'searchresults';
+    element.appendChild(results);
+    element.appendChild(searchfield);
+    function showSearchResults(searchstring) {
+        while (results.hasChildNodes())
+            results.removeChild(results.firstChild);
+        $.getJSON('http://nominatim.openstreetmap.org/search?format=json&limit=15&q='
+        + searchstring, function(data) {
+            var results = document.getElementById('searchresults');
+            var foundresults = false;
+            $.each(data, function(key, val) {
+                var btn = document.createElement("a");
+                btn.className = 'searchresult';
+                var t = document.createTextNode(val.display_name);
+                btn.appendChild(t);    
+                btn.addEventListener('click', function(e) {
+                    console.log(val);
+                    console.log(val.lat);
+                    map.getView().setCenter(ol.proj.transform([parseFloat(val.lon),
+                    parseFloat(val.lat)], 'EPSG:4326',
+                    'EPSG:3857'));
+                });
+                results.appendChild(btn);
+                foundresults = true
+            });
+
+            if (foundresults == false) 
+                results.appendChild(document.createTextNode("No results found"));
+            });
+    }
+    searchfield.addEventListener('keypress', function(e) {
+        if (e.keyCode == 13) // on enter
+            showSearchResults(e.target.value)});
+};
+
+function showOrHideSearch(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('a');
+    element.className = 'searchicon';
+    element.innerHTML = 'S';
+    element.setAttribute("title", "Search");
+    addSearchPanel();
+
+    element.addEventListener('click', function(e) {
+        var search = document.getElementById('search');
+        console.log(search);
+        if (search.getAttribute("hidden") == null)
+            search.setAttribute("hidden", "hidden");
+        else
+            sidePanelShowOnly("search");
+        }, 
+       false);
+
+    ol.control.Control.call(this, {
+        element: element,
+        target: options.target
+    });
+};
+ol.inherits(showOrHideSearch, ol.control.Control);
+
+/**
+ * @constructor
+ * @extends {ol.control.Control}
+ * @param {Object=} opt_options Control options.
+ */
+function showOrHideLayerSelector(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('a');
+    element.className = 'layerselectoricon';
+    element.innerHTML = 'L';
+    addLayerSelectorPanel();
+    
+    element.addEventListener('click', function(e) {
+        var panel = document.getElementById('layerselector');
+        console.log(panel);
+        if (panel.getAttribute("hidden") == null)
+            panel.setAttribute("hidden", "hidden");
+        else
+            sidePanelShowOnly("layerselector");
+        }, 
+       false);
+
+    ol.control.Control.call(this, {
+        element: element,
+        target: options.target
+    });
+};
+ol.inherits(showOrHideLayerSelector, ol.control.Control);
+
+function addLayerSelectorPanel() {
+    var element = document.createElement('div');
+    element.id = 'layerselector';
+    element.setAttribute("title", "Layers");
+    element.setAttribute("hidden", "hidden"); 
+    var sidebar = document.getElementById('sidebar');
+    sidebar.appendChild(element);
+    var layers = map.getLayers();
+    var addSelectorForLayer = function(elem, index, arr) {
+        var div = document.createElement("div");
+        div.className = 'layerselectorentry';
+        var checkbox = document.createElement("INPUT");
+        checkbox.setAttribute("type", "checkbox"); 
+        checkbox.setAttribute("name", elem.get('name'));
+        if (elem.getVisible())
+            checkbox.setAttribute("checked", "checked"); 
+        checkbox.setAttribute("value", index); 
+        checkbox.addEventListener('click', function(e) {
+            var layers = map.getLayers();
+            var button = e.currentTarget
+            layers.item(e.currentTarget.value).setVisible(e.currentTarget.checked);
+        });
+        var label = document.createTextNode(elem.get('name'));
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        element.appendChild(div);
+    };
+    layers.forEach(addSelectorForLayer);
+};
+
+/**
+ * @constructor
+ * @extends {ol.control.Control}
+ * @param {Object=} opt_options Control options.
+ */
+function LayerSelectorPanel(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('ul');
+    var layers = map.getLayers();
+    var addSelectorForLayer = function(elem, index, arr) {
+        var li = document.createElement("li");
+        var checkbox = document.createElement("INPUT");
+        checkbox.setAttribute("type", "checkbox"); 
+        checkbox.setAttribute("name", elem.get('name'));
+        if (elem.getVisible())
+            checkbox.setAttribute("checked", "checked"); 
+        checkbox.setAttribute("value", index); 
+        checkbox.addEventListener('click', function(e) {
+            var layers = map.getLayers();
+            var button = e.currentTarget
+            layers.item(e.currentTarget.value).setVisible(e.currentTarget.checked);
+        });
+        var label = document.createTextNode(elem.get('name'));
+        li.appendChild(checkbox);
+        li.appendChild(label);
+        element.appendChild(li);
+    };
+    layers.forEach(addSelectorForLayer);
+
+    ol.control.Control.call(this, {
+        element: element,
+        target: options.target
+    });
+};
+ol.inherits(LayerSelectorPanel, ol.control.Control);
+
+    // create layers
+    var layers = []
+
+    var layer_openstreetmap =  new ol.layer.Tile({
+        source: new ol.source.OSM(),
+        name: "OpenStreetMap"
+    });
+    layers[layers.length] = layer_openstreetmap;
+
+    // Bing
+    var layer_bing_aerial = new ol.layer.Tile({
+        name: 'Aerial photo',
+        visible: false,
+        preload: Infinity,
+        source: new ol.source.BingMaps({
+            key: 'AuA1b41REXrEohfokJjbHgCSp1EmwTcW8PEx_miJUvZERC0kbRnpotPTzGsPjGqa',
+            imagerySet: 'AerialWithLabels'
+        })
+    });
+    layers[layers.length] = layer_bing_aerial;
+
+    var layer_seamarks = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            url: 'http://t1.openseamap.org/seamark/{z}/{x}/{y}.png'
+        }),
+        name: "Sea marks"
+    });
+    layers[layers.length] = layer_seamarks;
+
+    var layer_elevation = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            url: 'http://openmapsurfer.uni-hd.de/tiles/asterh/x={x}&y={y}&z={z}'
+        }),
+        minResolution: 19.109257068634033,
+        name: "Elevation profile",
+        preload: 2,
+        visible: false,
+    });
+    layers[layers.length] = layer_elevation;
+
+    var layer_contour_lines = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            url: 'http://openmapsurfer.uni-hd.de/tiles/asterc/x={x}&y={y}&z={z}'
+        }),
+        minResolution: 1.194328566789627,
+        maxResolution: 19.109257068634033,
+        name: "Contour lines",
+        preload: 2,
+        visible: false,
+    });
+    layers[layers.length] = layer_contour_lines;
+
+    function coordinateToString(coordinate) {
+        padWithZeros = function(no, length) {
+            no = no + '';
+            return no.length >= length ? no : new Array(length - no.length + 1).join('0') + no;
+        };
+        var normalizedLatDegrees = ((coordinate[1] + 180) % 360) - 180;
+        var normalizedLonDegrees = ((coordinate[0] + 180) % 360) - 180;
+        var latsec = Math.abs(Math.round(3600 * normalizedLatDegrees));
+        var result = normalizedLatDegrees < 0 ? "S" : "N";
+        result += padWithZeros(Math.floor(latsec/3600), 2) + '\u00b0';
+        result += padWithZeros(Math.floor((latsec/60) % 60), 2) + ".";
+        result += padWithZeros(Math.floor(((latsec % 60)/60)*1000), 3) + '\u2032 ';
+        var lonsec = Math.abs(Math.round(3600 * normalizedLonDegrees));
+        result += normalizedLonDegrees < 0 ? "W" : "E";
+        result += padWithZeros(Math.floor(lonsec/3600), 3) + '\u00b0';
+        result += padWithZeros(Math.floor((lonsec/60) % 60), 2) + ".";
+        result += padWithZeros(Math.floor(((lonsec % 60)/60)*1000), 3) + '\u2032 ';
+        return result;
+    };
+
+    map = new ol.Map({
+        target: 'map',
+        layers: layers,
+        view: new ol.View({
+          center: ol.proj.transform([9, 52], 'EPSG:4326', 'EPSG:3857'),
+          zoom: 9
+        }),
+        controls: ol.control.defaults({
+          attributionOptions: {
+            collapsible: false
+          }
+        }).extend([
+          new showOrHideSearch({target: 'showsearch'}),
+          new ol.control.ScaleLine({className: 'scale-nautical', units: 'nautical'}),
+          new ol.control.ScaleLine({className: 'scale-metric'}),
+          new ol.control.FullScreen(),
+          new ol.control.MousePosition({coordinateFormat: coordinateToString, projection: ol.proj.get('EPSG:4326')})
+        ])
+      });
+      map.addControl(new ol.control.ZoomSlider());
+      map.addControl(new showOrHideLayerSelector({target: 'showlayerselector'}));
+    </script>
+  </body>
+</html>
+

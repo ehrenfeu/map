@@ -1,0 +1,158 @@
+body{height:100%}
+
+#map {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 100%;
+    width: 100%;
+  }
+
+.ol-zoom .ol-zoom-out {
+  margin-top: 202px;
+}
+
+.ol-zoomslider {
+  background-color: transparent;
+  top: 4.8em;
+}
+
+.ol-zoom {
+    top: 3em;
+}
+
+.ol-full-screen {
+    top: 0.5em;
+    left: 0.5em;
+    right: auto;
+}
+
+.ol-mouse-position {
+    top: auto;
+    right: auto;
+    left: 0em;
+    bottom: 0em;
+    background: rgba(255,255,255,0.8);
+    font-size: 10px;
+    font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+    padding: 4px;
+}
+
+.scale-metric, .scale-nautical {
+    position:absolute;
+    background: none;
+    padding: 4px;
+    border-radius: 4px;
+    left:0px;
+    bottom:18px;
+}
+
+.scale-nautical {
+    bottom:35px;
+}
+
+.scale-metric-inner, .scale-nautical-inner{
+    border:2px solid black;
+    color:black;
+    font-size: 10px;
+    font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+    text-align:center;
+    margin:1px;
+    padding:0 2px
+}
+
+.scale-metric-inner { border-bottom: none; }
+
+.scale-nautical-inner { border-top: none; }
+
+  #sidepanel {
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    z-index: 2;
+  }
+
+
+  #sidebar {
+    position: relative;
+    float: right;
+    height: 100%;
+    max-width: 250px;
+    background: rgba(255,255,255,0.9);
+  }
+
+  #menubuttons {
+    position: relative;
+    float: right;
+  }
+
+  .layerselectoricon, .searchicon{
+    position: relative;
+    top: 50px;
+    float: right;
+    padding: 2px;
+    background: rgba(0,60,136,1);
+    height: 22px;
+    color: white;
+    font-size: 16px;
+    font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    margin: 1px;
+    text-decoration: none;
+    text-align: center;
+    width: 22px;
+    display: block;
+  }
+
+ .layerselectorentry {
+    display: block;
+    padding-left: 20px;
+    text-indent: -22px;
+  }
+
+  .layerselectorentry input {
+    width: 13px;
+    height: 13px;
+    vertical-align: bottom;
+    text-indent: 0px;
+  }
+  
+  #layerselector {
+    padding: 10px; 
+    width: 230px;
+  }
+ .search {
+    height: 100%;
+    width: 250px;
+ }
+ .inputfield {
+    display: block;
+    padding: 5px 5px 5px 25px;
+    border: solid 3px #c9c9c9;
+    transition: border 0.3s;
+    font-size: 10px;
+    font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+    width: 214px;
+    background: url(../icons/magnifying-glass-2x.png) no-repeat 4px 4px;
+ }
+ 
+ .inputfield:focus {
+      border: solid 3px #969696;
+ }
+
+
+ .searchresult{ 
+    display: block; 
+    font-size: 10px;
+    font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+    padding: 5px;
+ }
+ .searchresult:hover{ 
+    background: lightgray;
+ }
+ #searchresults{
+    position: absolute;
+    overflow-y: auto;
+    top: 30px;
+    bottom: 0px;
+ }
