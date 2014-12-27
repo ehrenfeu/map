@@ -1,0 +1,31 @@
+function init() {
+
+    map = new ol.Map({
+        target: 'map',
+        layers: [],
+        renderer: 'canvas',
+        view: new ol.View({
+          center: ol.proj.transform([9, 53.5], 'EPSG:4326', 'EPSG:3857'),
+          zoom: 9
+        }),
+        controls: ol.control.defaults({
+          attributionOptions: {
+            collapsible: false
+          }
+        }).extend([
+          new ol.control.ScaleLine({className: 'scale-nautical', units: 'nautical'}),
+          new ol.control.ScaleLine({className: 'scale-metric'}),
+          new ol.control.FullScreen(),
+          new ol.control.ZoomSlider(),
+        ])
+      });
+
+    OpenStreetMap.registerLayers();
+    BingAerial.registerLayers();
+    SeaMarks.registerLayers();
+    Elevation.registerLayers();
+
+    MousePosition.registerControl();
+    LayerSelector.registerControl();
+    Search.registerControl();
+}
