@@ -24,6 +24,9 @@ function init() {
     BingAerial.registerLayers();
     SeaMarks.registerLayers();
     Elevation.registerLayers();
+    WaterLevels.registerLayers();
+    
+    WaterLevels.registerInteraction();
 
     MousePosition.registerControl();
     LayerSelector.registerControl();
