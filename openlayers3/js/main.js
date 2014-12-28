@@ -7,16 +7,14 @@ function init() {
           center: ol.proj.transform([9, 53.5], 'EPSG:4326', 'EPSG:3857'),
           zoom: 9
         }),
-        controls: ol.control.defaults({
-          attributionOptions: {
-            collapsible: false
-          }
-        }).extend([
-          new ol.control.ScaleLine({className: 'scale-nautical', units: 'nautical'}),
-          new ol.control.ScaleLine({className: 'scale-metric'}),
-          new ol.control.FullScreen(),
-          new ol.control.ZoomSlider(),
-        ])
+        controls: [
+            new ol.control.Zoom(),
+            new ol.control.Attribution({collapsible: false}),
+            new ol.control.ScaleLine({className: 'scale-nautical', units: 'nautical'}),
+            new ol.control.ScaleLine({className: 'scale-metric'}),
+            new ol.control.FullScreen(),
+            new ol.control.ZoomSlider()
+        ]
       });
 
     OpenStreetMap.registerLayers();
