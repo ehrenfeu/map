@@ -70,7 +70,7 @@ body{
     position: absolute;
     right: 0px;
     height: 100%;
-    z-index: 2;
+    z-index: 3;
   }
 
 
@@ -159,13 +159,9 @@ body{
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 3;
-  display: none;
+  z-index:1000;
   padding: 1px;
   font-size: 14px;
-  font-weight: normal;
-  line-height: 1.42857143;
-  text-align: left;
   background-color: #ffffff;
   -webkit-background-clip: padding-box;
           background-clip: padding-box;
@@ -174,7 +170,6 @@ body{
   border-radius: 6px;
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  white-space: normal;
 }
 .popover.top {
   margin-top: -10px;
@@ -274,4 +269,9 @@ body{
   border-right-width: 0;
   border-left-color: #ffffff;
   bottom: -10px;
+}
+
+#close {
+    position: relative;
+    float: right;
 }

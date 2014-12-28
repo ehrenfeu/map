@@ -1,5 +1,4 @@
 function init() {
-
     map = new ol.Map({
         target: 'map',
         layers: [],

@@ -16,14 +16,18 @@ WaterLevels.registerLayers = function() {
             },
             strategy: ol.loadingstrategy.all,
             projection: 'EPSG:3857',
+            attributions: [
+                new ol.Attribution({
+                      html: 'Water level data from <a target="_blank" href="http://www.pegelonline.wsv.de">www.pegelonline.wsv.de</a>'
+                })
+            ]
         });
     var layer = new ol.layer.Vector({
         title: 'Water levels Germany',
         source: vectorSource,
             style: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 3,
-                fill: new ol.style.Fill({color: 'red'})
+            image: new ol.style.Icon({
+                src: 'icons/tidal_scale_16.png',
             })
         }),
         name: "Levels",
@@ -65,10 +69,10 @@ WaterLevels.registerInteraction = function() {
     var popup = new ol.Overlay({
       element: element,
       positioning: 'bottom-center',
-      stopEvent: false
+      stopEvent: true
     });
     map.addOverlay(popup);
-    var select = new ol.interaction.Select({condition: ol.events.condition.mouseMove});
+    var select = new ol.interaction.Select({condition: ol.events.condition.click});
     select.getFeatures().on('add', function(evt) {
     $(element).popover('destroy');
     feature = evt.element;
@@ -78,6 +82,7 @@ WaterLevels.registerInteraction = function() {
         popup.setPosition(coord);
         $(element).popover({
           'animation': false,
+          'container': '#popup',
           'placement': function(node, source) {
                 var position = source.getBoundingClientRect();;
                 if (position.left > 515) { return "left"; }
@@ -86,7 +91,9 @@ WaterLevels.registerInteraction = function() {
                 return "top";
            },
           'html': true,
-          'title': feature.get('longname'),
+          'title': feature.get('longname') + 
+                   '<button type="button" id="close" class="close" ' + 
+                   'onclick="$(&quot;#popup&quot;).popover(&quot;destroy&quot;);">&times;</button>',
           'content': getLevelHtml(feature)
         });
         $(element).popover('show');
