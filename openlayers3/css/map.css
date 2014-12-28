@@ -280,3 +280,17 @@ body{
     position: relative;
     float: right;
 }
+
+.windscale {
+    position: absolute;
+    bottom: 60px;
+    padding: 4px;
+}
+
+.windscale_color {
+    width: 20px;
+    min-height: 15px;
+    color: white;
+    font-size: 10px;
+    text-align:center;
+}
