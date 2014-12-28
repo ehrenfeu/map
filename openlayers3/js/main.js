@@ -29,4 +29,5 @@ function init() {
     MousePosition.registerControl();
     LayerSelector.registerControl();
     Search.registerControl();
+    ZoomLevel.registerControl();
 }

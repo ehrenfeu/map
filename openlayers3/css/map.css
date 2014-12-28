@@ -18,6 +18,7 @@ body{
 .ol-zoomslider {
   background-color: transparent;
   top: 4.8em;
+  height: 195px;
 }
 
 .ol-zoom {
@@ -291,6 +292,11 @@ body{
     width: 20px;
     min-height: 15px;
     color: white;
+    font-size: 10px;
+    text-align:center;
+}
+
+.zoom_level {
     font-size: 10px;
     text-align:center;
 }
