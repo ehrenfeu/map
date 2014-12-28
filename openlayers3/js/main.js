@@ -5,7 +5,9 @@ function init() {
         renderer: 'canvas',
         view: new ol.View({
           center: ol.proj.transform([9, 53.5], 'EPSG:4326', 'EPSG:3857'),
-          zoom: 9
+          zoom: 9,
+          minZoom: 1,
+          maxZoom: 17
         }),
         controls: [
             new ol.control.Zoom(),
