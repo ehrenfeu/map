@@ -35,7 +35,7 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
     element.setAttribute("hidden", "hidden"); 
     var sidebar = document.getElementById('sidebar');
     sidebar.appendChild(element);
-    var addSelectorForLayer = function(elem, index, arr) {
+    var addSelectorForLayer = function(elem, index, parentElement) {
         var div = document.createElement("div");
         div.className = 'layerselectorentry';
         var checkbox = document.createElement("INPUT");
@@ -45,53 +45,36 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
             checkbox.setAttribute("checked", "checked"); 
         checkbox.setAttribute("value", index); 
         checkbox.addEventListener('click', function(e) {
-            var layers_ = map.getLayers();
-            var button = e.currentTarget
-            layers_.item(e.currentTarget.value).setVisible(e.currentTarget.checked);
+            elem.setVisible(e.currentTarget.checked);
+            var showChildren = e.currentTarget.checked ? 'block' : 'none';
+            next =  e.currentTarget.nextElementSibling;
+            while (goog.isDefAndNotNull(next)) {
+                next.style.display = showChildren;
+                next = next.nextElementSibling;
+            }
         });
         var label = document.createTextNode(elem.get('name'));
         div.appendChild(checkbox);
         div.appendChild(label);
-        element.appendChild(div);
+        var layers = elem.get('layers');
+        if (goog.isDefAndNotNull(layers)) {
+            var subdiv = document.createElement("div");
+            div.appendChild(subdiv);
+            if (!elem.getVisible())
+                subdiv.style.display = 'none';
+            if (goog.isDefAndNotNull(elem.selectorEntryFunction)) {
+                var groupOption = elem.selectorEntryFunction();
+                subdiv.appendChild(groupOption);
+            }
+            for (var i = 0; i < layers.getLength(); i++)
+                addSelectorForLayer(layers.item(i), i, subdiv);
+        }
+        parentElement.appendChild(div);
     };
-    layers.forEach(addSelectorForLayer);
+    for (var i = 0; i < layers.getLength(); i++)
+        addSelectorForLayer(layers.item(i), i, element);
 };
 
-/**
- * @constructor
- * @extends {ol.control.Control}
- * @param {Object=} opt_options Control options.
- */
-LayerSelector.LayerSelectorPanel = function (opt_options) {
-    var options = opt_options || {};
-    var element = document.createElement('ul');
-    var layers = map.getLayers();
-    var addSelectorForLayer = function(elem, index, arr) {
-        var li = document.createElement("li");
-        var checkbox = document.createElement("INPUT");
-        checkbox.setAttribute("type", "checkbox"); 
-        checkbox.setAttribute("name", elem.get('name'));
-        if (elem.getVisible())
-            checkbox.setAttribute("checked", "checked"); 
-        checkbox.setAttribute("value", index); 
-        checkbox.addEventListener('click', function(e) {
-            var layers = map.getLayers();
-            var button = e.currentTarget
-            layers.item(e.currentTarget.value).setVisible(e.currentTarget.checked);
-        });
-        var label = document.createTextNode(elem.get('name'));
-        li.appendChild(checkbox);
-        li.appendChild(label);
-        element.appendChild(li);
-    };
-    layers.forEach(addSelectorForLayer);
-
-    ol.control.Control.call(this, {
-        element: element,
-        target: options.target
-    });
-};
-ol.inherits(LayerSelector.LayerSelectorPanel, ol.control.Control);
 
 LayerSelector.registerControl = function() {
     var layers = map.getLayers();

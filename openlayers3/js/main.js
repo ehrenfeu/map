@@ -24,6 +24,7 @@ function init() {
     SeaMarks.registerLayers();
     Elevation.registerLayers();
     WaterLevels.registerLayers();
+    Weather.registerLayers();
     
     WaterLevels.registerInteraction();
 

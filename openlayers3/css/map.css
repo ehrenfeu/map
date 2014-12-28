@@ -271,6 +271,11 @@ body{
   bottom: -10px;
 }
 
+#weather_time_select {
+    width: 100%;
+    margin-left: 22px;
+}
+
 #close {
     position: relative;
     float: right;
