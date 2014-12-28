@@ -3,6 +3,7 @@ var WaterLevels = WaterLevels || {};
 WaterLevels.registerLayers = function() {
     var vectorSource = new ol.source.ServerVector({
             format: new WaterLevels.LevelFormat(),
+            visible: false,
             loader: function(extent, resolution, projection) {
                 var url = 'http://www.pegelonline.wsv.de/webservices/rest-api/v2' +
                     '/stations.json?includeTimeseries=true&includeCurrentMeasurement=true&prettyprint=false';
@@ -31,7 +32,7 @@ WaterLevels.registerLayers = function() {
             })
         }),
         name: "Levels",
-        visible: true,
+        visible: false,
     });
     map.addLayer(layer);
 };
