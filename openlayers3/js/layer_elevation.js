@@ -6,11 +6,9 @@ Elevation.registerLayers = function() {
             url: 'http://openmapsurfer.uni-hd.de/tiles/asterh/x={x}&y={y}&z={z}'
         }),
         minResolution: 19.109257068634033,
-        name: "Elevation profile",
+        name: "Shading",
         preload: 2,
-        visible: false,
     });
-    map.addLayer(layer_elevation);
 
     var layer_contour_lines = new ol.layer.Tile({
         source: new ol.source.XYZ({
@@ -20,7 +18,12 @@ Elevation.registerLayers = function() {
         maxResolution: 19.109257068634033,
         name: "Contour lines",
         preload: 2,
-        visible: false,
     });
-    map.addLayer(layer_contour_lines);
+
+    var group = new ol.layer.Group({
+        layers: [layer_elevation, layer_contour_lines],
+        name: "Elevation Profile",
+        visible: false
+    });
+    map.addLayer(group);
 };

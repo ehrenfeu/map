@@ -14,7 +14,7 @@ Stamen.registerLayers = function() {
         source: new ol.source.Stamen({
             layer: 'terrain-labels'
         }),
-        name: 'Terrain labels',
+        name: 'Labels (U.S. only)',
         visible: false
     });
     map.addLayer(layer);
