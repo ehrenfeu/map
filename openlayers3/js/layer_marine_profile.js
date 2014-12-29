@@ -10,7 +10,8 @@ MarineProfile.registerLayers = function() {
         name: "Deepshade",
         opacity: 0.6, 
         minResolution: 38.22,
-        extent: ol.proj.transformExtent([-180, -85, 180, 85], 'EPSG:4326', 'EPSG:3857')
+        extent: ol.proj.transformExtent([-180, -85, 180, 85], 'EPSG:4326', 'EPSG:3857'),
+        visible: false,
     });
     map.addLayer(layer_shading);
  
@@ -21,7 +22,8 @@ MarineProfile.registerLayers = function() {
         }),
         name: "Contours",
         opacity: 0.4, 
-        extent: ol.proj.transformExtent([-180, -85, 180, 85], 'EPSG:4326', 'EPSG:3857')
+        extent: ol.proj.transformExtent([-180, -85, 180, 85], 'EPSG:4326', 'EPSG:3857'),
+        visible: false,
     });
     map.addLayer(layer_contours);
 };
