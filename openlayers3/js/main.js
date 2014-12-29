@@ -21,6 +21,7 @@ function init() {
 
     OpenStreetMap.registerLayers();
     BingAerial.registerLayers();
+    Stamen.registerLayers();
     SeaMarks.registerLayers();
     Elevation.registerLayers();
     MarineProfile.registerLayers();
