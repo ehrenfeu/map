@@ -23,6 +23,7 @@ function init() {
     BingAerial.registerLayers();
     SeaMarks.registerLayers();
     Elevation.registerLayers();
+    MarineProfile.registerLayers();
     WaterLevels.registerLayers();
     Weather.registerLayers();
     
