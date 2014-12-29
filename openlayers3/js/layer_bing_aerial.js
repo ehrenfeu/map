@@ -10,5 +10,6 @@ BingAerial.registerLayers = function() {
             imagerySet: 'AerialWithLabels'
         })
     });
+    layer.isBaseLayer = true;
     map.addLayer(layer);
 }

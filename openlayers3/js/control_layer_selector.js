@@ -35,6 +35,8 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
     element.setAttribute("hidden", "hidden"); 
     var sidebar = document.getElementById('sidebar');
     sidebar.appendChild(element);
+    var select = document.createElement("select");
+    element.appendChild(select);
     var addSelectorForLayer = function(elem, index, parentElement) {
         var div = document.createElement("div");
         div.className = 'layerselectorentry';
@@ -71,8 +73,30 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
         }
         parentElement.appendChild(div);
     };
-    for (var i = 0; i < layers.getLength(); i++)
-        addSelectorForLayer(layers.item(i), i, element);
+    for (var i = 0; i < layers.getLength(); i++) {
+        var layer = layers.item(i);
+        console.log(layer);
+        if (goog.isDefAndNotNull(layer.isBaseLayer) &&
+            layer.isBaseLayer) {
+            var option = document.createElement("option");
+            option.setAttribute("value", i);
+            option.innerHTML = layer.get('name');
+            if (layer.getVisible())
+                option.setAttribute("selected", "selected");
+            select.appendChild(option);
+        } else {
+            addSelectorForLayer(layer, i, element);
+        }
+    }
+    select.addEventListener('change', function(e) {
+        for (var i = 0; i < layers.getLength(); i++) {
+            var layer = layers.item(i);
+            if (goog.isDefAndNotNull(layer.isBaseLayer) &&
+                layer.isBaseLayer) {
+                layer.setVisible(e.target.value == i);
+            }
+        }
+    });
 };
 
 

@@ -5,5 +5,6 @@ OpenStreetMap.registerLayers = function() {
         source: new ol.source.OSM(),
         name: "OpenStreetMap"
     });
+    layer.isBaseLayer = true;
     map.addLayer(layer);
 };
