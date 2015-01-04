@@ -16,8 +16,10 @@ LayerSelector.showOrHideLayerSelector = function(opt_options) {
         var panel = document.getElementById('layerselector');
         if (panel.getAttribute("hidden") == null)
             panel.setAttribute("hidden", "hidden");
-        else
-            sidePanelShowOnly("layerselector");
+        else {
+            stopAllSidebarServices();
+            LayerSelector.start();
+        }
         }, 
        false);
 
@@ -75,7 +77,6 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
     };
     for (var i = 0; i < layers.getLength(); i++) {
         var layer = layers.item(i);
-        console.log(layer);
         if (goog.isDefAndNotNull(layer.isBaseLayer) &&
             layer.isBaseLayer) {
             var option = document.createElement("option");
@@ -99,8 +100,18 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
     });
 };
 
-
 LayerSelector.registerControl = function() {
     var layers = map.getLayers();
     map.addControl(new LayerSelector.showOrHideLayerSelector({target: 'showlayerselector', layers: layers}));
+    sidebarservices.push(LayerSelector);
 };
+
+LayerSelector.start = function() {
+    var panel = document.getElementById('layerselector');
+    panel.removeAttribute("hidden");
+}
+
+LayerSelector.stop = function() {
+    var panel = document.getElementById('layerselector');
+    panel.setAttribute("hidden", "hidden");
+}

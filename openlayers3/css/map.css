@@ -88,7 +88,7 @@ body{
     float: right;
   }
 
-  .layerselectoricon, .searchicon{
+  .layerselectoricon, .searchicon, .tripplannericon{
     position: relative;
     top: 50px;
     float: right;
@@ -124,6 +124,10 @@ body{
     height: 100%;
   }
  .search {
+    height: 100%;
+    width: 250px;
+ }
+ .tripplanner {
     height: 100%;
     width: 250px;
  }
@@ -300,4 +304,30 @@ body{
 .zoom_level {
     font-size: 10px;
     text-align:center;
+}
+
+#tripplanner {
+    padding-left: 5px;
+    font-size: 14px;
+    overflow-y: auto;
+    width: 245px;
+    height: 100%;
+}
+
+#tripplannertable {
+    padding-bottom: 5px;
+}
+
+#tripplanner .label {
+    font-weight: bold;
+}
+
+#tripplanner .position {
+    padding: 5px;
+}
+
+#tripplanner .routesegment {
+    border-left: 2px solid #003C88;
+    margin-left: 5px;
+    padding: 5px;
 }

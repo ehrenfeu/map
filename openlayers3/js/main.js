@@ -1,4 +1,6 @@
 function init() {
+    sidebarservices = [];
+
     map = new ol.Map({
         target: 'map',
         layers: [],
@@ -34,4 +36,5 @@ function init() {
     LayerSelector.registerControl();
     Search.registerControl();
     ZoomLevel.registerControl();
+    TripPlanner.registerControl();
 }

@@ -19,8 +19,6 @@ Search.SearchResults = function(opt_options) {
     element.appendChild(results);
     element.appendChild(searchfield);
     var sidebar = document.getElementById('sidebar');
-    while (sidebar.hasChildNodes())
-        sidebar.removeChild(sidebar.firstChild);
     function showSearchResults(searchstring) {
         while (results.hasChildNodes())
             results.removeChild(results.firstChild);
@@ -114,8 +112,10 @@ Search.showOrHideSearch = function(opt_options) {
         var search = document.getElementById('search');
         if (search.getAttribute("hidden") == null)
             search.setAttribute("hidden", "hidden");
-        else
-            sidePanelShowOnly("search");
+        else {
+            stopAllSidebarServices();
+            Search.start();
+        }
         }, 
        false);
 
@@ -129,4 +129,15 @@ ol.inherits(Search.showOrHideSearch, ol.control.Control);
 Search.registerControl = function() {
     var ctrl = new Search.showOrHideSearch({target: 'showsearch'});
     map.addControl(ctrl);
+    sidebarservices.push(Search);
 };
+
+Search.start = function() {
+    var panel = document.getElementById('search');
+    panel.removeAttribute("hidden");
+}
+
+Search.stop = function() {
+    var panel = document.getElementById('search');
+    panel.setAttribute("hidden", "hidden");
+}

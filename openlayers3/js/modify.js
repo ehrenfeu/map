@@ -1,4 +1,14 @@
-goog.provide('ol.interaction.Modify');
+/* 
+ * This is a modified version of the respecitve openlayers 3 file that emits
+ * "modified" events in some situations. We currently need this for the trip
+ * planner tool. The alternative would be to listen to change events of the
+ * feature collection but these fire constantly during dragging. Hopefully,
+ * openlayers will include this functionality at some point so that we can
+ * get rid of this file.
+ */
+
+goog.provide('ol.interaction.MyModify');
+goog.provide('ol.MyModifyEvent');
 
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -24,6 +34,36 @@ goog.require('ol.interaction.Pointer');
 goog.require('ol.structs.RBush');
 goog.require('ol.style.Style');
 
+/**
+ * @enum {string}
+ */
+ol.MyModifyEventType = {
+  /**
+   * Triggered upon mouse up
+   * @event ol.MyModifyEvent#modified
+   * @api
+   */
+  MODIFIED: 'modified',
+};
+
+
+/**
+ * @classdesc
+ * Events emitted by {@link ol.interaction.MyModify} instances are instances of
+ * this type.
+ *
+ * @constructor
+ * @extends {goog.events.Event}
+ * @implements {oli.DrawEvent}
+ * @param {ol.DrawEventType} type Type.
+ * @param {ol.Feature} feature The feature drawn.
+ */
+ol.MyModifyEvent = function(type) {
+
+  goog.base(this, type);
+
+};
+goog.inherits(ol.MyModifyEvent, goog.events.Event);
 
 /**
  * @typedef {{depth: (Array.<number>|undefined),
@@ -42,16 +82,17 @@ ol.interaction.SegmentDataType;
  *
  * @constructor
  * @extends {ol.interaction.Pointer}
+ * @fires ol.MyModifyEvent
  * @param {olx.interaction.ModifyOptions} options Options.
  * @api stable
  */
-ol.interaction.Modify = function(options) {
+ol.interaction.MyModify = function(options) {
 
   goog.base(this, {
-    handleDownEvent: ol.interaction.Modify.handleDownEvent_,
-    handleDragEvent: ol.interaction.Modify.handleDragEvent_,
-    handleEvent: ol.interaction.Modify.handleEvent,
-    handleUpEvent: ol.interaction.Modify.handleUpEvent_
+    handleDownEvent: ol.interaction.MyModify.handleDownEvent_,
+    handleDragEvent: ol.interaction.MyModify.handleDragEvent_,
+    handleEvent: ol.interaction.MyModify.handleEvent,
+    handleUpEvent: ol.interaction.MyModify.handleUpEvent_
   });
 
   /**
@@ -117,7 +158,7 @@ ol.interaction.Modify = function(options) {
    */
   this.overlay_ = new ol.FeatureOverlay({
     style: goog.isDef(options.style) ? options.style :
-        ol.interaction.Modify.getDefaultStyleFunction()
+        ol.interaction.MyModify.getDefaultStyleFunction()
   });
 
   /**
@@ -149,14 +190,14 @@ ol.interaction.Modify = function(options) {
       this.handleFeatureRemove_, false, this);
 
 };
-goog.inherits(ol.interaction.Modify, ol.interaction.Pointer);
+goog.inherits(ol.interaction.MyModify, ol.interaction.Pointer);
 
 
 /**
  * @param {ol.Feature} feature Feature.
  * @private
  */
-ol.interaction.Modify.prototype.addFeature_ = function(feature) {
+ol.interaction.MyModify.prototype.addFeature_ = function(feature) {
   var geometry = feature.getGeometry();
   if (goog.isDef(this.SEGMENT_WRITERS_[geometry.getType()])) {
     this.SEGMENT_WRITERS_[geometry.getType()].call(this, feature, geometry);
@@ -171,7 +212,7 @@ ol.interaction.Modify.prototype.addFeature_ = function(feature) {
 /**
  * @inheritDoc
  */
-ol.interaction.Modify.prototype.setMap = function(map) {
+ol.interaction.MyModify.prototype.setMap = function(map) {
   this.overlay_.setMap(map);
   goog.base(this, 'setMap', map);
 };
@@ -181,7 +222,7 @@ ol.interaction.Modify.prototype.setMap = function(map) {
  * @param {ol.CollectionEvent} evt Event.
  * @private
  */
-ol.interaction.Modify.prototype.handleFeatureAdd_ = function(evt) {
+ol.interaction.MyModify.prototype.handleFeatureAdd_ = function(evt) {
   var feature = evt.element;
   goog.asserts.assertInstanceof(feature, ol.Feature);
   this.addFeature_(feature);
@@ -192,7 +233,7 @@ ol.interaction.Modify.prototype.handleFeatureAdd_ = function(evt) {
  * @param {ol.CollectionEvent} evt Event.
  * @private
  */
-ol.interaction.Modify.prototype.handleFeatureRemove_ = function(evt) {
+ol.interaction.MyModify.prototype.handleFeatureRemove_ = function(evt) {
   var feature = evt.element;
   var rBush = this.rBush_;
   var i, nodesToRemove = [];
@@ -218,7 +259,7 @@ ol.interaction.Modify.prototype.handleFeatureRemove_ = function(evt) {
  * @param {ol.geom.Point} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writePointGeometry_ =
+ol.interaction.MyModify.prototype.writePointGeometry_ =
     function(feature, geometry) {
   var coordinates = geometry.getCoordinates();
   var segmentData = /** @type {ol.interaction.SegmentDataType} */ ({
@@ -235,7 +276,7 @@ ol.interaction.Modify.prototype.writePointGeometry_ =
  * @param {ol.geom.MultiPoint} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writeMultiPointGeometry_ =
+ol.interaction.MyModify.prototype.writeMultiPointGeometry_ =
     function(feature, geometry) {
   var points = geometry.getCoordinates();
   var coordinates, i, ii, segmentData;
@@ -258,7 +299,7 @@ ol.interaction.Modify.prototype.writeMultiPointGeometry_ =
  * @param {ol.geom.LineString} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writeLineStringGeometry_ =
+ol.interaction.MyModify.prototype.writeLineStringGeometry_ =
     function(feature, geometry) {
   var coordinates = geometry.getCoordinates();
   var i, ii, segment, segmentData;
@@ -280,7 +321,7 @@ ol.interaction.Modify.prototype.writeLineStringGeometry_ =
  * @param {ol.geom.MultiLineString} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writeMultiLineStringGeometry_ =
+ol.interaction.MyModify.prototype.writeMultiLineStringGeometry_ =
     function(feature, geometry) {
   var lines = geometry.getCoordinates();
   var coordinates, i, ii, j, jj, segment, segmentData;
@@ -306,7 +347,7 @@ ol.interaction.Modify.prototype.writeMultiLineStringGeometry_ =
  * @param {ol.geom.Polygon} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writePolygonGeometry_ =
+ol.interaction.MyModify.prototype.writePolygonGeometry_ =
     function(feature, geometry) {
   var rings = geometry.getCoordinates();
   var coordinates, i, ii, j, jj, segment, segmentData;
@@ -332,7 +373,7 @@ ol.interaction.Modify.prototype.writePolygonGeometry_ =
  * @param {ol.geom.MultiPolygon} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writeMultiPolygonGeometry_ =
+ol.interaction.MyModify.prototype.writeMultiPolygonGeometry_ =
     function(feature, geometry) {
   var polygons = geometry.getCoordinates();
   var coordinates, i, ii, j, jj, k, kk, rings, segment, segmentData;
@@ -361,7 +402,7 @@ ol.interaction.Modify.prototype.writeMultiPolygonGeometry_ =
  * @param {ol.geom.GeometryCollection} geometry Geometry.
  * @private
  */
-ol.interaction.Modify.prototype.writeGeometryCollectionGeometry_ =
+ol.interaction.MyModify.prototype.writeGeometryCollectionGeometry_ =
     function(feature, geometry) {
   var i, geometries = geometry.getGeometriesArray();
   for (i = 0; i < geometries.length; ++i) {
@@ -376,7 +417,7 @@ ol.interaction.Modify.prototype.writeGeometryCollectionGeometry_ =
  * @return {ol.Feature} Vertex feature.
  * @private
  */
-ol.interaction.Modify.prototype.createOrUpdateVertexFeature_ =
+ol.interaction.MyModify.prototype.createOrUpdateVertexFeature_ =
     function(coordinates) {
   var vertexFeature = this.vertexFeature_;
   if (goog.isNull(vertexFeature)) {
@@ -394,10 +435,10 @@ ol.interaction.Modify.prototype.createOrUpdateVertexFeature_ =
 /**
  * @param {ol.MapBrowserPointerEvent} evt Event.
  * @return {boolean} Start drag sequence?
- * @this {ol.interaction.Modify}
+ * @this {ol.interaction.MyModify}
  * @private
  */
-ol.interaction.Modify.handleDownEvent_ = function(evt) {
+ol.interaction.MyModify.handleDownEvent_ = function(evt) {
   this.handlePointerAtPixel_(evt.pixel, evt.map);
   this.dragSegments_ = [];
   var vertexFeature = this.vertexFeature_;
@@ -428,10 +469,10 @@ ol.interaction.Modify.handleDownEvent_ = function(evt) {
 
 /**
  * @param {ol.MapBrowserPointerEvent} evt Event.
- * @this {ol.interaction.Modify}
+ * @this {ol.interaction.MyModify}
  * @private
  */
-ol.interaction.Modify.handleDragEvent_ = function(evt) {
+ol.interaction.MyModify.handleDragEvent_ = function(evt) {
   var vertex = evt.coordinate;
   for (var i = 0, ii = this.dragSegments_.length; i < ii; ++i) {
     var dragSegment = this.dragSegments_[i];
@@ -482,16 +523,17 @@ ol.interaction.Modify.handleDragEvent_ = function(evt) {
 /**
  * @param {ol.MapBrowserPointerEvent} evt Event.
  * @return {boolean} Stop drag sequence?
- * @this {ol.interaction.Modify}
+ * @this {ol.interaction.MyModify}
  * @private
  */
-ol.interaction.Modify.handleUpEvent_ = function(evt) {
+ol.interaction.MyModify.handleUpEvent_ = function(evt) {
   var segmentData;
   for (var i = this.dragSegments_.length - 1; i >= 0; --i) {
     segmentData = this.dragSegments_[i][0];
     this.rBush_.update(ol.extent.boundingExtent(segmentData.segment),
         segmentData);
   }
+  this.dispatchEvent(new ol.MyModifyEvent(ol.MyModifyEventType.MODIFIED));
   return false;
 };
 
@@ -499,10 +541,10 @@ ol.interaction.Modify.handleUpEvent_ = function(evt) {
 /**
  * @param {ol.MapBrowserEvent} mapBrowserEvent Map browser event.
  * @return {boolean} `false` to stop event propagation.
- * @this {ol.interaction.Modify}
+ * @this {ol.interaction.MyModify}
  * @api
  */
-ol.interaction.Modify.handleEvent = function(mapBrowserEvent) {
+ol.interaction.MyModify.handleEvent = function(mapBrowserEvent) {
   var handled;
   if (!mapBrowserEvent.map.getView().getHints()[ol.ViewHint.INTERACTING] &&
       mapBrowserEvent.type == ol.MapBrowserEvent.EventType.POINTERMOVE) {
@@ -523,7 +565,7 @@ ol.interaction.Modify.handleEvent = function(mapBrowserEvent) {
  * @param {ol.MapBrowserEvent} evt Event.
  * @private
  */
-ol.interaction.Modify.prototype.handlePointerMove_ = function(evt) {
+ol.interaction.MyModify.prototype.handlePointerMove_ = function(evt) {
   this.lastPixel_ = evt.pixel;
   this.handlePointerAtPixel_(evt.pixel, evt.map);
 };
@@ -534,7 +576,7 @@ ol.interaction.Modify.prototype.handlePointerMove_ = function(evt) {
  * @param {ol.Map} map Map.
  * @private
  */
-ol.interaction.Modify.prototype.handlePointerAtPixel_ = function(pixel, map) {
+ol.interaction.MyModify.prototype.handlePointerAtPixel_ = function(pixel, map) {
   var pixelCoordinate = map.getCoordinateFromPixel(pixel);
   var sortByDistance = function(a, b) {
     return ol.coordinate.squaredDistanceToSegment(pixelCoordinate, a.segment) -
@@ -599,7 +641,7 @@ ol.interaction.Modify.prototype.handlePointerAtPixel_ = function(pixel, map) {
  * @param {ol.Coordinate} vertex Vertex.
  * @private
  */
-ol.interaction.Modify.prototype.insertVertex_ = function(segmentData, vertex) {
+ol.interaction.MyModify.prototype.insertVertex_ = function(segmentData, vertex) {
   var segment = segmentData.segment;
   var feature = segmentData.feature;
   var geometry = segmentData.geometry;
@@ -671,7 +713,7 @@ ol.interaction.Modify.prototype.insertVertex_ = function(segmentData, vertex) {
  * @return {boolean} True when a vertex was removed.
  * @private
  */
-ol.interaction.Modify.prototype.removeVertex_ = function() {
+ol.interaction.MyModify.prototype.removeVertex_ = function() {
   var dragSegments = this.dragSegments_;
   var segmentsByFeature = {};
   var deleted = false;
@@ -756,6 +798,8 @@ ol.interaction.Modify.prototype.removeVertex_ = function() {
       }
     }
   }
+  if (deleted)
+    this.dispatchEvent(new ol.MyModifyEvent(ol.MyModifyEventType.MODIFIED));
   return deleted;
 };
 
@@ -767,7 +811,7 @@ ol.interaction.Modify.prototype.removeVertex_ = function() {
  * @param {number} delta Delta (1 or -1).
  * @private
  */
-ol.interaction.Modify.prototype.updateSegmentIndices_ = function(
+ol.interaction.MyModify.prototype.updateSegmentIndices_ = function(
     geometry, index, depth, delta) {
   this.rBush_.forEachInExtent(geometry.getExtent(), function(segmentDataMatch) {
     if (segmentDataMatch.geometry === geometry &&
@@ -783,7 +827,7 @@ ol.interaction.Modify.prototype.updateSegmentIndices_ = function(
 /**
  * @return {ol.style.StyleFunction} Styles.
  */
-ol.interaction.Modify.getDefaultStyleFunction = function() {
+ol.interaction.MyModify.getDefaultStyleFunction = function() {
   var style = ol.style.createDefaultEditingStyles();
   return function(feature, resolution) {
     return style[ol.geom.GeometryType.POINT];
