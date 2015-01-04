@@ -37,6 +37,10 @@ LayerSelector.addLayerSelectorPanel = function(layers) {
     element.setAttribute("hidden", "hidden"); 
     var sidebar = document.getElementById('sidebar');
     sidebar.appendChild(element);
+    var label = document.createElement("span");
+    label.id = 'layerselectorbaselabel';
+    label.innerHTML = 'Base layer:';
+    element.appendChild(label);
     var select = document.createElement("select");
     element.appendChild(select);
     var addSelectorForLayer = function(elem, index, parentElement) {

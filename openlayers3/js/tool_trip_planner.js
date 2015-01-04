@@ -5,6 +5,8 @@ TripPlanner.featureOverlay = null;
 TripPlanner.draw = null;
 TripPlanner.modify = null;
 
+TripPlanner.routeInfo = [];
+
 TripPlanner.addPanel = function(opt_options) {
     var options = opt_options || {};
     var element = document.createElement('div');
@@ -28,17 +30,43 @@ TripPlanner.addPanel = function(opt_options) {
     addTableRow(table, "Finish");
     addTableRow(table, "Distance");
     element.appendChild(table);
-
-    var route = document.createElement('div');
-    route.id = 'route';
-    element.appendChild(route);
     
     var clearbutton = document.createElement('INPUT');
     clearbutton.addEventListener('click', function(evt) {TripPlanner.clear();});
     clearbutton.setAttribute("type", "button"); 
     clearbutton.setAttribute("value", "Clear"); 
     element.appendChild(clearbutton);
+
+    var route = document.createElement('div');
+    route.id = 'route';
+    element.appendChild(route);
+
     TripPlanner.updateRoute();
+
+    var download = document.createElement('div');
+    var addRadioButton = function(filetype, checked) {
+        var radio = document.createElement('input');
+        radio.setAttribute("type", "radio"); 
+        radio.setAttribute("name", "filetype"); 
+        radio.setAttribute("value", filetype);
+        if (checked)
+            radio.checked = true;
+        download.appendChild(radio);
+        var span = document.createElement('span');
+        span.innerHTML = filetype;
+        download.appendChild(span);
+    }; 
+    addRadioButton('CSV', true);
+    addRadioButton('KML');
+    addRadioButton('GML');
+    
+    var downloadbutton = document.createElement('INPUT');
+    downloadbutton.id = 'tripplannerdownload';
+    downloadbutton.addEventListener('click', function(evt) {TripPlanner.download();});
+    downloadbutton.setAttribute("type", "image"); 
+    downloadbutton.setAttribute("src", "icons/data-transfer-download-2x.png"); 
+    download.appendChild(downloadbutton);
+    element.appendChild(download);
 };
 
 TripPlanner.showOrHideButton = function(opt_options) {
@@ -119,10 +147,11 @@ TripPlanner.updateRoute = function() {
     while (route.firstChild)
         route.removeChild(route.firstChild);
     var features = TripPlanner.featureOverlay.getFeatures();
+    TripPlanner.routeInfo = [];
     if (!features.getLength()) {
         table.rows[0].cells[1].innerHTML = '&mdash;'; 
         table.rows[1].cells[1].innerHTML = '&mdash;'; 
-        table.rows[2].cells[1].innerHTML = '&mdash; nm'; 
+        table.rows[2].cells[1].innerHTML = '&mdash; nm';
     } else {
         var linefeature = features.item(0);
         coords = linefeature.getGeometry().getCoordinates();
@@ -132,11 +161,13 @@ TripPlanner.updateRoute = function() {
         table.rows[0].cells[1].innerHTML = coordinateToString(pos).replace(' ', '<br/>');
         var position = document.createElement('div');
         position.className = 'position';
-        position.innerHTML = coordinateToString(pos);
+        var stringPos = coordinateToString(pos);
+        position.innerHTML = stringPos;
         route.appendChild(position);
         for (var i = 1; i < coords.length; i++) {
             var last = next;
             var last_4326 = pos;
+            var lastStringPos = stringPos;
             next = coords[i];
             var pos = ol.proj.transform(next, 'EPSG:3857', 'EPSG:4326')
             var entry = document.createElement('div');
@@ -152,9 +183,15 @@ TripPlanner.updateRoute = function() {
                 'initial bearing ' + round((initialbearing + 360)%360, 2) + '\u00b0<br/>' + 
                 'final bearing ' + round((finalbearing + 360)%360, 2) + '\u00b0';
             route.appendChild(entry);
+            stringPos = coordinateToString(pos);
             position = document.createElement('div');
-            position.innerHTML = coordinateToString(pos);
+            position.className = 'position';
+            position.innerHTML = stringPos;
             route.appendChild(position);
+            TripPlanner.routeInfo.push([i, lastStringPos, stringPos,
+                                        distance_nm_cosine,
+                                        (initialbearing+360)%360,
+                                        (finalbearing+360)%360]);
         }
         table.rows[1].cells[1].innerHTML = coordinateToString(pos).replace(' ', '<br/>');
         table.rows[2].cells[1].innerHTML = round(total_distance, 2) + ' nm'; 
@@ -183,4 +220,37 @@ TripPlanner.clear = function() {
     TripPlanner.featureOverlay.getFeatures().clear();
     TripPlanner.updateRoute();
     TripPlanner.start();
+}
+            
+TripPlanner.download = function() {
+    var filetype = $('input[name=filetype]:checked').val();
+    var data;
+    var route = TripPlanner.featureOverlay.getFeatures().item(0);
+    switch (filetype) {
+        case "GML": // does not work as intended?
+            var gml = new ol.format.GML3({
+                featureType: 'LineString',
+                featureNS: 'http://www.opengis.net/gml',
+            });
+            data = gml.writeFeatures([route], {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:3857'
+            });
+            break;
+        case "KML":
+            var kml = new ol.format.KML();
+            data = kml.writeFeatures([route], {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:3857'
+            });
+            break;
+        case "CSV":
+            var csv = ['No;Starting position;Destination position;Distance (nm);Initial bearing;Final bearing'];
+            for (var i = 0; i < TripPlanner.routeInfo.length; i++)
+                csv.push(TripPlanner.routeInfo[i].join(';'));
+            data = csv.join('\n');
+    }
+    var blob = new Blob([data], {type: 'octet/stream'});
+    var filename = 'route.' + filetype.toLowerCase();
+    saveAs(blob, filename);
 }

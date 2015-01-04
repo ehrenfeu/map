@@ -123,6 +123,12 @@ body{
     width: 250px;
     height: 100%;
   }
+
+  #layerselectorbaselabel {
+    padding-left: 7px;
+    padding-right: 5px;
+  }
+
  .search {
     height: 100%;
     width: 250px;
@@ -330,4 +336,8 @@ body{
     border-left: 2px solid #003C88;
     margin-left: 5px;
     padding: 5px;
+}
+
+#tripplannerdownload {
+    margin-left: 8px;
 }
