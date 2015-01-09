@@ -3,24 +3,39 @@ function stopAllSidebarServices() {
         sidebarservices[i].stop();
 }
 
-function coordinateToString(coordinate) {
-    padWithZeros = function(no, length) {
+function degreesToStringShort(degrees, hemispheres) {
+    var normalizedDegrees = ((degrees + 180) % 360) - 180;
+    var sec = Math.abs(Math.round(3600 * normalizedDegrees));
+    var min = (sec/60)%60;
+    var result = Math.floor(sec/3600) + '\u00b0';
+    if (!min)
+        return result;
+    if (min%1 === 0) // min is integer
+        return result + min + '\u2032 ';
+    return result + min.toFixed(1) + '\u2032 ';
+}
+
+function degreesToString(degrees, hemispheres) {
+    var padWithZeros = function(no, length) {
         no = no + '';
         return no.length >= length ? no : new Array(length - no.length + 1).join('0') + no;
     };
-    var normalizedLatDegrees = ((coordinate[1] + 180) % 360) - 180;
-    var normalizedLonDegrees = ((coordinate[0] + 180) % 360) - 180;
-    var latsec = Math.abs(Math.round(3600 * normalizedLatDegrees));
-    var result = normalizedLatDegrees < 0 ? "S" : "N";
-    result += padWithZeros(Math.floor(latsec/3600), 2) + '\u00b0';
-    result += padWithZeros(Math.floor((latsec/60) % 60), 2) + ".";
-    result += padWithZeros(Math.floor(((latsec % 60)/60)*1000), 3) + '\u2032 ';
-    var lonsec = Math.abs(Math.round(3600 * normalizedLonDegrees));
-    result += normalizedLonDegrees < 0 ? "W" : "E";
-    result += padWithZeros(Math.floor(lonsec/3600), 3) + '\u00b0';
-    result += padWithZeros(Math.floor((lonsec/60) % 60), 2) + ".";
-    result += padWithZeros(Math.floor(((lonsec % 60)/60)*1000), 3) + '\u2032 ';
+    var normalizedDegrees = ((degrees + 180) % 360) - 180;
+    var sec = Math.abs(Math.round(3600 * normalizedDegrees));
+    var result = '';
+    var pos = degrees < 0 ? 0 : 1;
+    var padding = hemispheres[0] == 'W' ? 3 : 2;
+    var result = hemispheres[pos];
+    result += padWithZeros(Math.floor(sec/3600), padding) + '\u00b0';
+    var min = (sec/60)%60;
+    result += padWithZeros(Math.floor(min), 2) + ".";
+    result += padWithZeros(Math.floor(((sec % 60)/60)*1000), 3) + '\u2032 ';
     return result;
+}
+
+function coordinateToString(coordinate) {
+    return degreesToString(coordinate[1], ["S","N"]) +
+           degreesToString(coordinate[0], ["W","E"]);
 };
 
 function round(number, precision) {

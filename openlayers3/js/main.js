@@ -29,6 +29,7 @@ function init() {
     MarineProfile.registerLayers();
     WaterLevels.registerLayers();
     Weather.registerLayers();
+    CoordinateGrid.registerLayers();
     
     WaterLevels.registerInteraction();
 
