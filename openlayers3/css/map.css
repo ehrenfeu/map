@@ -346,3 +346,7 @@ body{
 #tripplannerdownload {
     margin-left: 8px;
 }
+
+#currentPermalink {
+    width: 100%;
+}

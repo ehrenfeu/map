@@ -1,6 +1,7 @@
 var WaterLevels = WaterLevels || {};
 
 WaterLevels.queryKey = "ll";
+WaterLevels.layer = 'undefined';
 
 WaterLevels.registerLayers = function() {
     var vectorSource = new ol.source.ServerVector({
@@ -40,6 +41,7 @@ WaterLevels.registerLayers = function() {
     });
     addCookieUpdater(layer, key);
     map.addLayer(layer);
+    WaterLevels.layer = layer;
 };
 
 WaterLevels.registerInteraction = function() {
@@ -146,3 +148,7 @@ WaterLevels.LevelFormat.prototype.readFeaturesFromObject = function(object, opt_
                     opt_options));
     return features;
 };
+
+WaterLevels.updateQueryParam = function(query) {
+    query[WaterLevels.queryKey] = WaterLevels.layer.getVisible() ? 's' : 'h';
+}

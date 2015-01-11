@@ -1,6 +1,7 @@
 var SeaMarks = SeaMarks || {};
 
 SeaMarks.queryKey = "ls";
+SeaMarks.layer = 'undefined';
 
 SeaMarks.registerLayers = function() {
     var key = "seamarks";
@@ -14,4 +15,9 @@ SeaMarks.registerLayers = function() {
     });
     addCookieUpdater(layer, key);
     map.addLayer(layer);
+    SeaMarks.layer = layer;
 };
+
+SeaMarks.updateQueryParam = function(query) {
+    query[SeaMarks.queryKey] = SeaMarks.layer.getVisible() ? 's' : 'h';
+}

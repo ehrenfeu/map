@@ -2,6 +2,9 @@ var Weather = Weather || {};
 
 Weather.queryKey = "lw";
 
+Weather.layer = 'undefined';
+Weather.subLayers = [];
+
 Weather.sourceUrls = [
     ['Wind', 'http://www.openportguide.org/tiles/actual/wind_vector/TIME/{z}/{x}/{y}.png', true, "lww"],
     ['Air Pressure', 'http://www.openportguide.org/tiles/actual/surface_pressure/TIME/{z}/{x}/{y}.png', false, "lwa"],
@@ -72,12 +75,12 @@ Weather.registerLayers = function() {
             });
         }
         addCookieUpdater(layer, key);
-        layers[layers.length] = layer;
+        Weather.subLayers.push(layer);
     }
     var key = "weather";
     var show = evaluateLayerVisibility(Weather.queryKey, key, false);
     var group = new ol.layer.Group({
-        layers: layers,
+        layers: Weather.subLayers,
         name: "Weather",
         visible: show
     });
@@ -90,6 +93,7 @@ Weather.registerLayers = function() {
     });
     addCookieUpdater(group, key);
     map.addLayer(group);
+    Weather.layer = group;
 };
 
 Weather.refreshLayers = function(time) {
@@ -134,3 +138,12 @@ Weather.createLayerSelectorEntry = function() {
     select.id = "weather_time_select";
     return select;
 };
+
+Weather.updateQueryParam = function(query) {
+    query[Weather.queryKey] = Weather.layer.getVisible() ? 's' : 'h';
+    for (var i = 0; i < Weather.sourceUrls.length; i++) {
+        var layer = Weather.subLayers[i];
+        var key = Weather.sourceUrls[i][3];
+        query[key] = layer.getVisible() ? 's' : 'h';
+    }
+}

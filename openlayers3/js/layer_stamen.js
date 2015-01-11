@@ -1,10 +1,11 @@
 var Stamen = Stamen || {};
 
 Stamen.queryKey = "lq";
+Stamen.layer = 'undefined';
 
 Stamen.registerLayers = function() {
     var key = "stamen";
-    var show = evaluateLayerVisibility(OpenStreetMap.queryKey, key, false);
+    var show = evaluateLayerVisibility(Stamen.queryKey, key, false);
     var layer_base = new ol.layer.Tile({
         source: new ol.source.Stamen({
             layer: 'watercolor'
@@ -26,4 +27,9 @@ Stamen.registerLayers = function() {
     group.isBaseLayer = true;
     addCookieUpdater(group, key);
     map.addLayer(group);
+    Stamen.layer = group;
 };
+
+Stamen.updateQueryParam = function(query) {
+    query[Stamen.queryKey] = Stamen.layer.getVisible() ? 's' : 'h';
+}

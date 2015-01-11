@@ -1,6 +1,7 @@
 var OpenStreetMap = OpenStreetMap || {};
 
 OpenStreetMap.queryKey = "lo";
+OpenStreetMap.layer = 'undefined';
 
 OpenStreetMap.registerLayers = function() {
     var key = 'openstreetmap';
@@ -13,4 +14,9 @@ OpenStreetMap.registerLayers = function() {
     layer.isBaseLayer = true;
     addCookieUpdater(layer, key);
     map.addLayer(layer);
+    OpenStreetMap.layer = layer;
 };
+
+OpenStreetMap.updateQueryParam = function(query) {
+    query[OpenStreetMap.queryKey] = OpenStreetMap.layer.getVisible() ? 's' : 'h';
+}

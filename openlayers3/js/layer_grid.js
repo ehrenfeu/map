@@ -1,5 +1,6 @@
 var CoordinateGrid = CoordinateGrid || {};
 CoordinateGrid.queryKey = "lg";
+CoordinateGrid.layer = 'undefined';
 
 CoordinateGrid.getStepWidth = function(distance_seconds, max_lines) {
     var min_dist = distance_seconds / max_lines;
@@ -113,5 +114,10 @@ CoordinateGrid.registerLayers = function() {
         visible: show,
     });
     addCookieUpdater(layer, key);
+    CoordinateGrid.layer = layer;
     map.addLayer(layer);
 };
+
+CoordinateGrid.updateQueryParam = function(query) {
+    query[CoordinateGrid.queryKey] = CoordinateGrid.layer.getVisible() ? 's' : 'h';
+}

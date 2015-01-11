@@ -1,6 +1,7 @@
 var BingAerial = BingAerial || {};
 
 BingAerial.queryKey = "la";
+BingAerial.layer = 'undefined';
 
 BingAerial.registerLayers = function() {
     var key = 'aerial';
@@ -17,4 +18,9 @@ BingAerial.registerLayers = function() {
     layer.isBaseLayer = true;
     addCookieUpdater(layer, key);
     map.addLayer(layer);
+    BingAerial.layer = layer;
+}
+
+BingAerial.updateQueryParam = function(query) {
+    query[BingAerial.queryKey] = BingAerial.layer.getVisible() ? 's' : 'h';
 }
