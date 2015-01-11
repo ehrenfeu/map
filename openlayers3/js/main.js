@@ -1,5 +1,7 @@
 function init() {
     sidebarservices = [];
+    queryStrings = getQueryValues();
+    console.log(window.location.href);
 
     map = new ol.Map({
         target: 'map',
@@ -21,15 +23,12 @@ function init() {
         ]
       });
 
-    OpenStreetMap.registerLayers();
-    BingAerial.registerLayers();
-    Stamen.registerLayers();
-    SeaMarks.registerLayers();
-    Elevation.registerLayers();
-    MarineProfile.registerLayers();
-    WaterLevels.registerLayers();
-    Weather.registerLayers();
-    CoordinateGrid.registerLayers();
+
+    var layers = [OpenStreetMap, BingAerial, Stamen, SeaMarks, Elevation,
+        MarineProfile, WaterLevels, Weather, CoordinateGrid]
+
+    for (var i = 0; i < layers.length; i++)
+        layers[i].registerLayers(queryStrings);
     
     WaterLevels.registerInteraction();
 
@@ -38,4 +37,5 @@ function init() {
     Search.registerControl();
     ZoomLevel.registerControl();
     TripPlanner.registerControl();
+    PermaLink.registerControl();
 }

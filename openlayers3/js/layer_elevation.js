@@ -1,7 +1,13 @@
 var Elevation = Elevation || {};
 
+Elevation.queryKey = "le";
+Elevation.queryKeyShading = "les";
+Elevation.queryKeyContour = "lec";
+
 Elevation.registerLayers = function() {
-    var key_shading = "elev_shade";
+    var keyShading = "elev_shade";
+    var showShading = evaluateLayerVisibility(Elevation.queryKeyShading,
+                                              keyShading, true);
     var layer_shading = new ol.layer.Tile({
         source: new ol.source.XYZ({
             url: 'http://openmapsurfer.uni-hd.de/tiles/asterh/x={x}&y={y}&z={z}'
@@ -9,11 +15,13 @@ Elevation.registerLayers = function() {
         minResolution: 19.109257068634033,
         name: "Shading",
         preload: 2, // TODO
-        visible: showLayerAccordingToCookie(key_shading, true),
+        visible: showShading,
     });
-    addCookieUpdater(layer_shading, key_shading);
+    addCookieUpdater(layer_shading, keyShading);
 
-    var key_contour = "elev_cont";
+    var keyContour = "elev_cont";
+    var showContour = evaluateLayerVisibility(Elevation.queryKeyContour,
+                                              keyContour, true);
     var layer_contour_lines = new ol.layer.Tile({
         source: new ol.source.XYZ({
             url: 'http://openmapsurfer.uni-hd.de/tiles/asterc/x={x}&y={y}&z={z}'
@@ -22,16 +30,18 @@ Elevation.registerLayers = function() {
         maxResolution: 19.109257068634033,
         name: "Contour lines",
         preload: 2,
-        visible: showLayerAccordingToCookie(key_contour, true),
+        visible: showContour,
     });
-    addCookieUpdater(layer_contour_lines, key_contour);
+    addCookieUpdater(layer_contour_lines, keyContour);
 
-    var key_elevation = "elev";
+    var keyElevation = "elev";
+    var showElevation = evaluateLayerVisibility(Elevation.queryKey,
+                                                keyElevation, false);
     var group = new ol.layer.Group({
         layers: [layer_shading, layer_contour_lines],
         name: "Elevation Profile",
-        visible: showLayerAccordingToCookie(key_elevation, false),
+        visible: showElevation,
     });
-    addCookieUpdater(group, key_elevation);
+    addCookieUpdater(group, keyElevation);
     map.addLayer(group);
 };

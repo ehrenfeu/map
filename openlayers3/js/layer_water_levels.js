@@ -1,5 +1,7 @@
 var WaterLevels = WaterLevels || {};
 
+WaterLevels.queryKey = "ll";
+
 WaterLevels.registerLayers = function() {
     var vectorSource = new ol.source.ServerVector({
             format: new WaterLevels.LevelFormat(),
@@ -24,6 +26,7 @@ WaterLevels.registerLayers = function() {
             ]
         });
     var key = 'water_levels';
+    var show = evaluateLayerVisibility(WaterLevels.queryKey, key, false);
     var layer = new ol.layer.Vector({
         title: 'Water levels Germany',
         source: vectorSource,
@@ -33,7 +36,7 @@ WaterLevels.registerLayers = function() {
             })
         }),
         name: "Levels",
-        visible: showLayerAccordingToCookie(key, false),
+        visible: show,
     });
     addCookieUpdater(layer, key);
     map.addLayer(layer);

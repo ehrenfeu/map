@@ -1,7 +1,10 @@
 var Stamen = Stamen || {};
 
+Stamen.queryKey = "lq";
+
 Stamen.registerLayers = function() {
     var key = "stamen";
+    var show = evaluateLayerVisibility(OpenStreetMap.queryKey, key, false);
     var layer_base = new ol.layer.Tile({
         source: new ol.source.Stamen({
             layer: 'watercolor'
@@ -18,7 +21,7 @@ Stamen.registerLayers = function() {
     var group = new ol.layer.Group({
         layers: [layer_base, layer_labels],
         name: "Watercolor",
-        visible: showLayerAccordingToCookie(key, false),
+        visible: show,
     });
     group.isBaseLayer = true;
     addCookieUpdater(group, key);

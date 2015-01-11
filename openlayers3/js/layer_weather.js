@@ -1,11 +1,13 @@
 var Weather = Weather || {};
 
+Weather.queryKey = "lw";
+
 Weather.sourceUrls = [
-    ['Wind', 'http://www.openportguide.org/tiles/actual/wind_vector/TIME/{z}/{x}/{y}.png', true],
-    ['Air Pressure', 'http://www.openportguide.org/tiles/actual/surface_pressure/TIME/{z}/{x}/{y}.png', false],
-    ['Temperature', 'http://www.openportguide.org/tiles/actual/air_temperature/TIME/{z}/{x}/{y}.png', false],
-    ['Precipitation', 'http://www.openportguide.org/tiles/actual/precipitation/TIME/{z}/{x}/{y}.png', false],
-    ['Wave Height', 'http://www.openportguide.org/tiles/actual/significant_wave_height/TIME/{z}/{x}/{y}.png', false],
+    ['Wind', 'http://www.openportguide.org/tiles/actual/wind_vector/TIME/{z}/{x}/{y}.png', true, "lww"],
+    ['Air Pressure', 'http://www.openportguide.org/tiles/actual/surface_pressure/TIME/{z}/{x}/{y}.png', false, "lwa"],
+    ['Temperature', 'http://www.openportguide.org/tiles/actual/air_temperature/TIME/{z}/{x}/{y}.png', false, "lwt"],
+    ['Precipitation', 'http://www.openportguide.org/tiles/actual/precipitation/TIME/{z}/{x}/{y}.png', false, "lwp"],
+    ['Wave Height', 'http://www.openportguide.org/tiles/actual/significant_wave_height/TIME/{z}/{x}/{y}.png', false, "lwh"],
 ];
 
 Weather.possibleTimes = [5, 7, 9, 11, 15, 19, 23, 27];
@@ -49,6 +51,8 @@ Weather.registerLayers = function() {
     for (i = 0; i < Weather.sourceUrls.length; i++) {
         var key = 'weather_' +
             Weather.sourceUrls[i][0].replace(RegExp(' ', 'g'), '_').toLowerCase();
+        var show = evaluateLayerVisibility(Weather.sourceUrls[i][3], key,
+                                           Weather.sourceUrls[i][2]);
         var source = new ol.source.XYZ({
                 url: Weather.sourceUrls[i][1].replace('TIME', Weather.time)
             });
@@ -57,7 +61,7 @@ Weather.registerLayers = function() {
         var layer = new ol.layer.Tile({
             source: source,
             name: Weather.sourceUrls[i][0],
-            visible: showLayerAccordingToCookie(key, Weather.sourceUrls[i][2])
+            visible: show,
         });
         if (key === "weather_wind") {
             layer.on('change:visible', function (evt) {
@@ -71,10 +75,11 @@ Weather.registerLayers = function() {
         layers[layers.length] = layer;
     }
     var key = "weather";
+    var show = evaluateLayerVisibility(Weather.queryKey, key, false);
     var group = new ol.layer.Group({
         layers: layers,
         name: "Weather",
-        visible: showLayerAccordingToCookie(key, false)
+        visible: show
     });
     group.selectorEntryFunction = Weather.createLayerSelectorEntry;
     group.on('change:visible', function (evt) {

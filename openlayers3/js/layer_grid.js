@@ -1,4 +1,5 @@
 var CoordinateGrid = CoordinateGrid || {};
+CoordinateGrid.queryKey = "lg";
 
 CoordinateGrid.getStepWidth = function(distance_seconds, max_lines) {
     var min_dist = distance_seconds / max_lines;
@@ -78,6 +79,7 @@ CoordinateGrid.registerLayers = function() {
             }
         });
     var key = "grid";
+    var show = evaluateLayerVisibility(CoordinateGrid.queryKey, key, false);
     var layer = new ol.layer.Vector({
         source: vectorSource,
         style: (function() {
@@ -108,7 +110,7 @@ CoordinateGrid.registerLayers = function() {
         })(),
         title: 'Coordinate Grid',
         name: "Coordinate Grid",
-        visible: showLayerAccordingToCookie(key, false),
+        visible: show,
     });
     addCookieUpdater(layer, key);
     map.addLayer(layer);

@@ -74,3 +74,30 @@ function showLayerAccordingToCookie(cname, defaultValue) {
         return !(getCookie(cname) === 'hide');
     return getCookie(cname) === 'show';
 }
+
+queryStrings = {};
+function registerQueryStringKey(key, defaultVal) {
+    // TODO error if key is already tegistered
+    queryStrings[key] = defaultVal;
+}
+
+function getQueryValues() {
+    var queryStrings = {};
+    var query = window.location.search.substring(1);
+    console.log(query);
+    var vars = query.split("&");
+    for (var i=0; i<vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair.length == 2)
+            queryStrings[pair[0]] = pair[1];
+    }
+    return queryStrings;
+}
+
+function evaluateLayerVisibility(queryKey, cookieKey, defaultVal) {
+    if (queryStrings[queryKey] === 's')
+        return true;
+    if (queryStrings[queryKey] === 'h')
+        return false;
+    return showLayerAccordingToCookie(cookieKey, defaultVal);
+}
