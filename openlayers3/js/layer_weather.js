@@ -47,6 +47,8 @@ Weather.windScale = new Weather.WindScale();
 Weather.registerLayers = function() {
     var layers = [];
     for (i = 0; i < Weather.sourceUrls.length; i++) {
+        var key = 'weather_' +
+            Weather.sourceUrls[i][0].replace(RegExp(' ', 'g'), '_').toLowerCase();
         var source = new ol.source.XYZ({
                 url: Weather.sourceUrls[i][1].replace('TIME', Weather.time)
             });
@@ -55,9 +57,9 @@ Weather.registerLayers = function() {
         var layer = new ol.layer.Tile({
             source: source,
             name: Weather.sourceUrls[i][0],
-            visible: Weather.sourceUrls[i][2]
+            visible: showLayerAccordingToCookie(key, Weather.sourceUrls[i][2])
         });
-        if (i == 0) { // wind layer
+        if (key === "weather_wind") {
             layer.on('change:visible', function (evt) {
                 if (evt.oldValue)
                     map.removeControl(Weather.windScale);
@@ -65,12 +67,14 @@ Weather.registerLayers = function() {
                     map.addControl(Weather.windScale);
             });
         }
+        addCookieUpdater(layer, key);
         layers[layers.length] = layer;
     }
+    var key = "weather";
     var group = new ol.layer.Group({
         layers: layers,
         name: "Weather",
-        visible: false
+        visible: showLayerAccordingToCookie(key, false)
     });
     group.selectorEntryFunction = Weather.createLayerSelectorEntry;
     group.on('change:visible', function (evt) {
@@ -79,6 +83,7 @@ Weather.registerLayers = function() {
         else if (evt.currentTarget.getLayers().item(0).getVisible()) 
             map.addControl(Weather.windScale);
     });
+    addCookieUpdater(group, key);
     map.addLayer(group);
 };
 

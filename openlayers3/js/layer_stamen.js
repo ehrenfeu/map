@@ -1,6 +1,7 @@
 var Stamen = Stamen || {};
 
 Stamen.registerLayers = function() {
+    var key = "stamen";
     var layer_base = new ol.layer.Tile({
         source: new ol.source.Stamen({
             layer: 'watercolor'
@@ -17,8 +18,9 @@ Stamen.registerLayers = function() {
     var group = new ol.layer.Group({
         layers: [layer_base, layer_labels],
         name: "Watercolor",
-        visible: false
+        visible: showLayerAccordingToCookie(key, false),
     });
     group.isBaseLayer = true;
+    addCookieUpdater(group, key);
     map.addLayer(group);
 };

@@ -77,6 +77,7 @@ CoordinateGrid.registerLayers = function() {
                 return [extent];
             }
         });
+    var key = "grid";
     var layer = new ol.layer.Vector({
         source: vectorSource,
         style: (function() {
@@ -107,7 +108,8 @@ CoordinateGrid.registerLayers = function() {
         })(),
         title: 'Coordinate Grid',
         name: "Coordinate Grid",
-        visible: true,
+        visible: showLayerAccordingToCookie(key, false),
     });
+    addCookieUpdater(layer, key);
     map.addLayer(layer);
 };

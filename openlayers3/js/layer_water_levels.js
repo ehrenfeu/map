@@ -23,6 +23,7 @@ WaterLevels.registerLayers = function() {
                 })
             ]
         });
+    var key = 'water_levels';
     var layer = new ol.layer.Vector({
         title: 'Water levels Germany',
         source: vectorSource,
@@ -32,8 +33,9 @@ WaterLevels.registerLayers = function() {
             })
         }),
         name: "Levels",
-        visible: false,
+        visible: showLayerAccordingToCookie(key, false),
     });
+    addCookieUpdater(layer, key);
     map.addLayer(layer);
 };
 
