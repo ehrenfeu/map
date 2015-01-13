@@ -73,7 +73,6 @@ TripPlanner.showOrHideButton = function(opt_options) {
     var options = opt_options || {};
     var element = document.createElement('a');
     element.className = 'tripplannericon';
-    element.innerHTML = 'T';
     element.setAttribute("title", "Trip planner");
     TripPlanner.addPanel();
 

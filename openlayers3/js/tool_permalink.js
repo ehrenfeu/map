@@ -26,8 +26,7 @@ PermaLink.showOrHideButton = function(opt_options) {
     var options = opt_options || {};
     var element = document.createElement('a');
     element.className = 'permalinkicon';
-    element.innerHTML = 'P';
-    element.setAttribute("title", "permalink");
+    element.setAttribute("title", "Permalink");
     PermaLink.addPanel();
 
     element.addEventListener('click', function(e) {

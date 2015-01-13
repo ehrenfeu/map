@@ -9,7 +9,7 @@ LayerSelector.showOrHideLayerSelector = function(opt_options) {
     var options = opt_options || {};
     var element = document.createElement('a');
     element.className = 'layerselectoricon';
-    element.innerHTML = 'L';
+    element.setAttribute("title", "View");
     LayerSelector.addLayerSelectorPanel(options.layers);
     
     element.addEventListener('click', function(e) {

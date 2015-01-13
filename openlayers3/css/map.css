@@ -93,17 +93,33 @@ body{
     top: 50px;
     float: right;
     padding: 2px;
-    background: rgba(0,60,136,1);
-    height: 22px;
+    background: url(../icons/open-iconic/compass-w.png) no-repeat 6px 5px rgba(0,60,136,1);
+    height: 24px;
+    width: 24px;
     color: white;
     font-size: 16px;
     font-weight: bold;
     margin: 1px;
     text-decoration: none;
     text-align: center;
-    width: 22px;
     display: block;
   }
+
+ .layerselectoricon {
+    background-image: url(../icons/open-iconic/eye-w.png);
+ }
+
+ .searchicon {
+    background-image: url(../icons/open-iconic/magnifying-glass-w.png);
+ }
+
+ .tripplannericon {
+    background-image: url(../icons/open-iconic/compass-w.png);
+ }
+
+ .permalinkicon {
+    background-image: url(../icons/open-iconic/link-intact-w.png);
+ }
 
  .layerselectorentry {
     display: block;

@@ -104,7 +104,6 @@ Search.showOrHideSearch = function(opt_options) {
     var options = opt_options || {};
     var element = document.createElement('a');
     element.className = 'searchicon';
-    element.innerHTML = 'S';
     element.setAttribute("title", "Search");
     Search.addSearchPanel();
 
