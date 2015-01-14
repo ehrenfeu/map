@@ -1,73 +1,92 @@
-// AJAX Nominatim Call
-// 16.04.2011
-// Gerit Wissing
+var Edit = Edit || {};
 
-function GetXmlHttpObject() {
-    try {
-        // Firefox. Opera, Sarafi
-        try {  // get firefox to do cross domain ajax
-            netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
-            netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-        } catch (err) {
-            //alert("Error initializing XMLHttpRequest.\n"+err); // show error
-        }
-        xmlHttp = new XMLHttpRequest(); // instantiate it regardless of security
-    }
-    catch(err) {
-        // Internet Explorer
-        try {
-            xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
-        } catch(err) {
-            xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-    }
-    return xmlHttp;
-}
+Edit.JOSMAvailable = false;
+Edit.baseUrl = "";
 
-function ajax(url, callback, infotext) {
-    var xmlhttp = GetXmlHttpObject();
-    //alert(url);
-    if (xmlhttp) {
-        //alert('doit');
-        xmlhttp.open("GET", url, true);
-        xmlhttp.onreadystatechange=function(){
-            //alert('readyState = ' + xmlhttp.readyState + ' / status = ' + xmlhttp.status);
-            if ( xmlhttp.readyState == 4  ) {
-                //alert(xmlhttp.responseText);
-                callback(xmlhttp, infotext);
-            }
-        }
-        xmlhttp.send(null);
-    }
-}
+Edit.addPanel = function(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('div');
+    element.id = 'edit';
+    element.className = 'edit';
+    element.setAttribute("hidden", "hidden"); 
+    var sidebar = document.getElementById('sidebar');
+    sidebar.appendChild(element);
+    var text = document.createElement('span');
+    text.innerHTML = '<p>For editing the map data you need the JOSM editor ' +
+        'with remote control enabled.</p><p>Have you <a target="_blank" ' +
+        'href="http://wiki.openseamap.org/wiki/JOSM_and_Plugin">' +
+        'installed and configured JOSM</a>?</p>' +
+        '<p>If everything is configured correctly, you can also try to load '+
+        'the map manually with this <a id="josm_base_url" href="" ' +
+        'target="_blank">link</a>.</p>';
+    element.appendChild(text);
+};
 
-function nominatim(searchtext) {
-    var url='./api/nominatim.php?q='+searchtext;
-    ajax(url, nominatim_callback, infotext=searchtext);
-}
+Edit.showOrHideButton = function(opt_options) {
+    var options = opt_options || {};
+    var element = document.createElement('a');
+    element.className = 'editicon';
+    element.setAttribute("title", "Edit map");
+    Edit.addPanel();
 
-function nominatim_callback(xmlHttp, infotext) {
-    if ( xmlHttp.status == 0 ) {
-        alert('"'+infotext+' not found.');
-    } else if ( xmlHttp.status == 200 ) {
-        if ( xmlHttp.responseXML.getElementsByTagName('place')[0] ) {   // is one place returned?
-            addSearchResults(xmlHttp);
+    element.addEventListener('click', function(e) {
+        var planner = document.getElementById('edit');
+        if (planner.getAttribute("hidden") == null) {
+            Edit.stop();
         } else {
-            alert('"'+infotext+'" not found.');
+            stopAllSidebarServices();
+            Edit.start();
+        }},
+       false);
+
+    ol.control.Control.call(this, {
+        element: element,
+        target: options.target
+    });
+};
+ol.inherits(Edit.showOrHideButton, ol.control.Control);
+
+Edit.registerControl = function() {
+    sidebarservices.push(Edit);
+    var ctrl = new Edit.showOrHideButton({target: 'showedit'});
+    map.addControl(ctrl);
+};
+
+Edit.start = function() {
+    var extent = map.getView().calculateExtent(map.getSize());
+    extent = ol.proj.transformExtent(extent, map.getView().getProjection() , 'EPSG:4326');
+    Edit.baseUrl = 'http://127.0.0.1:8111/load_and_zoom?left=' + extent[0] +
+        '&right=' + extent[2] + '&top=' + extent[3] + '&bottom=' + extent[1];
+    Edit.JOSMAvailable = false;
+    Edit.startJOSM(); // can set JOSMAvailable to true
+    setTimeout(function(){
+        //do what you need here
+        if (!Edit.JOSMAvailable) {
+            var panel = document.getElementById('edit');
+            document.getElementById('josm_base_url').href = Edit.baseUrl;
+            panel.removeAttribute("hidden");
         }
-    }
+    }, 150);
 }
 
+Edit.stop = function() {
+    var panel = document.getElementById('edit');
+    edit.setAttribute("hidden", "hidden");
+}
 
 // in addition to the CC-BY-SA of the wiki feel free to use the following source for any purpose without restrictions (PD)
 // credits and additions appreciated: http://wiki.openstreetmap.org/wiki/User:Stephankn
+// (has been adapted for openlayers 3 integration by http://wiki.openstreetmap.org/wiki/User:Dice)
 
-function checkJOSM(version){
-   alert(version.application + " uses protocol version " + version.protocolversion.major + "." + version.protocolversion.minor);
-   // do something useful, maybe showing edit button
+Edit.runJOSM = function(version) {
+//   alert(version.application + " uses protocol version " + version.protocolversion.major + "." + version.protocolversion.minor);
+    Edit.JOSMAvailable = true;
+    // IE 9 + localhost ajax DOES NOT WORK, therefore we use a fallback:
+    //window.open (baseUrl);
+    document.getElementById('josm_call_iframe').src=Edit.baseUrl;
 }
 
-function getJOSMVersion() {
+Edit.startJOSM = function() {
     var url = "http://127.0.0.1:8111/version";
     var useFallback = false;
     // currently FF3.5, Safari 4 and IE8 implement CORS
@@ -80,17 +99,16 @@ function getJOSMVersion() {
                 return;
              }
              if (request.status == 200) {
-                checkJOSM(eval('(' + request.responseText + ')'));
+                Edit.runJOSM(eval('(' + request.responseText + ')'));
              }
           };
           request.send();
-       }
-       else if (XDomainRequest) {
+       } else if (XDomainRequest) {
           var xdr = new XDomainRequest();
           try {
              xdr.open("get", url);
              xdr.onload = function(){
-                checkJOSM(eval('(' + xdr.responseText + ')'));
+                Edit.runJOSM(eval('(' + xdr.responseText + ')'));
              };
              xdr.send();
           } catch (e) {
@@ -108,7 +126,7 @@ function getJOSMVersion() {
     if (useFallback) {
        // Use legacy jsonp call
        var s = document.createElement('script');
-       s.src = url + '?jsonp=checkJOSM';
+       s.src = url + '?jsonp=runJOSM';
        s.type = 'text/javascript';
 
        if (document.getElementsByTagName('head').length > 0) {
@@ -116,16 +134,3 @@ function getJOSMVersion() {
        }
     }
 }
-
-function josm_call() {
-    left    = x2lon( map.getExtent().left   ).toFixed(5);
-    right   = x2lon( map.getExtent().right  ).toFixed(5);
-    // conflict with use of variable 'top' in internet explorer. (why?) use my_top instead. gw
-    my_top    = y2lat( map.getExtent().top    ).toFixed(5);
-    bottom  = y2lat( map.getExtent().bottom ).toFixed(5);
-    baseUrl = 'http://127.0.0.1:8111/load_and_zoom?left='+left+'&right='+right+'&top='+my_top+'&bottom='+bottom;
-    // IE 9 + localhost ajax GEHT NICHT, daher Fallback:
-    //window.open (baseUrl);
-    document.getElementById('josm_call_iframe').src=baseUrl;
-}
-

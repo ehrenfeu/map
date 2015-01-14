@@ -89,7 +89,7 @@ body{
     float: right;
   }
 
-  .layerselectoricon, .searchicon, .tripplannericon, .permalinkicon {
+  .layerselectoricon, .searchicon, .tripplannericon, .permalinkicon, .editicon {
     position: relative;
     top: 50px;
     float: right;
@@ -116,6 +116,10 @@ body{
 
  .permalinkicon {
     background-image: url(../icons/open-iconic/link-intact-w.png);
+ }
+
+ .editicon {
+    background-image: url(../icons/open-iconic/pencil-w.png);
  }
 
  .layerselectorentry {
@@ -178,11 +182,16 @@ body{
     bottom: 0px;
  }
  
- #permalink {
+ #permalink, #edit {
     height: 100%;
     width: 240px;
     padding-left: 5px;
     padding-right: 5px;
+ }
+
+ #edit p {
+    margin-top: 0px;
+    padding-top: 5px;
  }
 
 #currentPermalink {

@@ -26,9 +26,11 @@
     <script src='js/modify.js'></script>
     <script src='js/tool_trip_planner.js'></script>
     <script src='js/tool_permalink.js'></script>
+    <script src='js/tool_edit.js'></script>
     <script src='js/main.js'></script>
   </head>
   <body onload='init()'>
+    <iframe id="josm_call_iframe" src="#" style="visibility:hidden;"></iframe>
     <div id="map">
         <div id="popup"></div>
         <div id="sidepanel">
@@ -38,6 +40,7 @@
                 <div id="showsearch"></div>
                 <div id="showtripplanner"></div>
                 <div id="showpermalink"></div>
+                <div id="showedit"></div>
             </div>
         </div>
     </div>

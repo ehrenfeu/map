@@ -43,4 +43,5 @@ function init() {
     ZoomLevel.registerControl();
     TripPlanner.registerControl();
     PermaLink.registerControl();
+    Edit.registerControl();
 }
